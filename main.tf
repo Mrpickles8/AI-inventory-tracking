@@ -288,7 +288,7 @@ resource "aws_cloudwatch_event_rule" "TB_events_rule" {
 }
 
 resource "aws_cloudwatch_event_target" "TB_events_target" {
-  rule = aws_cloudwatch_events_rule.TB_events_rule.id
+  rule = aws_cloudwatch_event_rule.TB_events_rule.id
   arn  = aws_lambda_function.TB_lambda_function.arn
 }
 
@@ -298,7 +298,7 @@ resource "aws_lambda_permission" "allow_analysis_inventory" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.TB_lambda_function.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_events_rule.TB_events_rule.anr
+  source_arn    = aws_cloudwatch_event_rule.TB_events_rule.anr
 }
 
 output "app_url" {
