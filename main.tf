@@ -88,7 +88,7 @@ resource "aws_network_acl" "NACL_PUBLIC" {
     cidr_block = "0.0.0.0/0"
     from_port  = 80
     to_port    = 80
-     }
+  }
 
   ingress {
     protocol   = "tcp"
@@ -97,7 +97,7 @@ resource "aws_network_acl" "NACL_PUBLIC" {
     cidr_block = "0.0.0.0/0"
     from_port  = 1024
     to_port    = 65535
-    }
+  }
 
   egress {
     protocol   = "-1"
@@ -106,12 +106,12 @@ resource "aws_network_acl" "NACL_PUBLIC" {
     cidr_block = "0.0.0.0/0"
     from_port  = 0
     to_port    = 0
-    }
+  }
 }
 
 
 
-resource "aws_network_acl" "NACL_PRIVE1" { 
+resource "aws_network_acl" "NACL_PRIVE1" {
   vpc_id     = aws_vpc.Tigre_ble.id
   subnet_ids = [aws_subnet.prive_Tigre_ble1.id]
 
