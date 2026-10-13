@@ -19,7 +19,7 @@ terraform {
 
 
 provider "aws" {
-  region = eu-west-1
+  region = var.aws_region
 }
 
 
@@ -254,9 +254,10 @@ EOF
 
 
 
-data "archive_file" "lambda" {
-  source_path = "lambda_analysis.py"
-  output_file = "lamnda_analysis.zip"
+data "archive_type" "lambda" {
+  type        = "zip"
+  source_file = "lambda_analysis.py"
+  output_path = "lamnda_analysis.zip"
 }
 
 
