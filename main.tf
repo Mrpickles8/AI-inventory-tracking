@@ -290,7 +290,6 @@ resource "aws_cloudwatch_events_target" "TB_events_target" {
   arn  = aws_lambda_function.TB_lambda_function.arn
 }
 
-data "aws_caller_identity" "current" {}
 
 resource "aws_lambda_permissions" "allow_analysis_inventory" {
   statement_id  = "AllowExecutionFromCloudWatch"

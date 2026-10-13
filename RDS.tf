@@ -22,7 +22,6 @@ resource "aws_db_instance" "DI_Tigre_ble" {
   kms_key_id        = aws_kms_key.sg_Tigre_ble_rds.arn
 }
 
-data "aws_caller_identity" "current" {}
 
 resource "aws_kms_key" "rds" {
   description             = "KMS key for RDS encryption"
