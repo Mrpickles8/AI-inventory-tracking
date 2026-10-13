@@ -88,29 +88,30 @@ resource "aws_network_acl" "NACL_PUBLIC" {
     cidr_block = "0.0.0.0/0"
     from_port  = 80
     to_port    = 80
+     }
 
-    ingress {
-      protocol   = "tcp"
-      rule_no    = 160
-      action     = "allow"
-      cidr_block = "0.0.0.0/0"
-      from_port  = 1024
-      to_port    = 65535
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 160
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
     }
 
-    egress {
-      protocol   = "-1"
-      rule_no    = 100
-      action     = "allow"
-      cidr_block = "0.0.0.0/0"
-      from_port  = 0
-      to_port    = 0
+  egress {
+    protocol   = "-1"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 0
+    to_port    = 0
     }
-  }
 }
 
 
-resource "aws_network_acl" "NACL_PRIVE1" {
+
+resource "aws_network_acl" "NACL_PRIVE1" { 
   vpc_id     = aws_vpc.Tigre_ble.id
   subnet_ids = [aws_subnet.prive_Tigre_ble1.id]
 
@@ -199,7 +200,7 @@ resource "aws_iam_instance_profile" "Iam_inst_prof_Tigre_ble" {
 data "aws_ami" "ami_Tigre_bleu" {
   most_recent = true
   owners      = ["amazon"]
-  filters {
+  filter {
     name   = "name"
     values = ["al2023-ami-*-x86_64"]
   }
@@ -254,7 +255,7 @@ EOF
 
 
 
-data "archive_type" "lambda" {
+data "archive_file" "lambda" {
   type        = "zip"
   source_file = "lambda_analysis.py"
   output_path = "lamnda_analysis.zip"
@@ -272,7 +273,7 @@ resource "aws_lambda_function" "TB_lambda_function" {
 
   environment {
     variables = {
-      DB_HOST      = aws_db_instance.mysql.endpoint
+      DB_HOST      = aws_db_instance.DI_Tigre_ble.endpoint
       DB_PASSWORD  = var.db_password
       SENDER_EMAIL = var.admin_email
       ADMIN_EMAIL  = var.admin_email
@@ -281,18 +282,18 @@ resource "aws_lambda_function" "TB_lambda_function" {
 }
 
 
-resource "aws_cloudwatch_events_rule" "TB_events_rule" {
+resource "aws_cloudwatch_event_rule" "TB_events_rule" {
   name                 = "${var.project_name}-inventory-events-rule"
   schedule_expressions = "cron(0 0 * * ? *)"
 }
 
-resource "aws_cloudwatch_events_target" "TB_events_target" {
+resource "aws_cloudwatch_event_target" "TB_events_target" {
   rule = aws_cloudwatch_events_rule.TB_events_rule.id
   arn  = aws_lambda_function.TB_lambda_function.arn
 }
 
 
-resource "aws_lambda_permissions" "allow_analysis_inventory" {
+resource "aws_lambda_permission" "allow_analysis_inventory" {
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.TB_lambda_function.function_name

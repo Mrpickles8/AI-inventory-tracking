@@ -23,7 +23,7 @@ resource "aws_db_instance" "DI_Tigre_ble" {
 }
 
 
-resource "aws_kms_key" "rds" {
+resource "aws_kms_key" "Tigre_ble_rds" {
   description             = "KMS key for RDS encryption"
   deletion_window_in_days = 7
   enable_key_rotation     = true
@@ -44,7 +44,7 @@ resource "aws_kms_key" "rds" {
         Sid    = "AllowEC2"
         Effect = "Allow"
         Principal = {
-          AWS = aws_iam_role.ec2.arn
+          AWS = aws_iam_role.ec2_Tigre_ble.arn
         }
         Action = [
           "kms:Decrypt",
@@ -56,7 +56,7 @@ resource "aws_kms_key" "rds" {
         Sid    = "AllowLambda"
         Effect = "Allow"
         Principal = {
-          AWS = aws_iam_role.lambda.arn
+          AWS = aws_iam_role.lambda_role_Tigre_ble.arn
         }
         Action = [
           "kms:Decrypt",
