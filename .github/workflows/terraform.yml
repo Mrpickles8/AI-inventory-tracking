@@ -48,9 +48,9 @@ jobs:
         if: github.event_name == 'pull_request'
         run: terraform plan -no-color
         env:
-          TF_VAR_ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          TF_VAR_DB_USER: ${{ secrets.DB_USER }}
-          TF_VAR_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_admin_email: ${{ secrets.ADMIN_EMAIL }}
+          TF_VAR_db_user: ${{ secrets.DB_USER }}
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
 
   terraform-deploy:
     name: Terraform Deploy
@@ -81,9 +81,9 @@ jobs:
       - name: Terraform Apply
         run: terraform apply -auto-approve
         env:
-          TF_VAR_ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          TF_VAR_DB_USER: ${{ secrets.DB_USER }}
-          TF_VAR_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_admin_email: ${{ secrets.ADMIN_EMAIL }}
+          TF_VAR_db_user: ${{ secrets.DB_USER }}
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
 
       - name: Test AI Lambda
         run: |
@@ -126,6 +126,6 @@ jobs:
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
         env:
-          TF_VAR_ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          TF_VAR_DB_USER: ${{ secrets.DB_USER }}
-          TF_VAR_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          TF_VAR_admin_email: ${{ secrets.ADMIN_EMAIL }}
+          TF_VAR_db_user: ${{ secrets.DB_USER }}
+          TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
