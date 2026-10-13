@@ -269,7 +269,7 @@ resource "aws_lambda_function" "TB_lambda_function" {
   handler          = "lambda_ai_analysis.lambda_handler"
   source_code_hash = data.archive_file.lambda.output_base64sha256
 
-  runtime = "python3.14.6"
+  runtime = "python3.13"
 
   environment {
     variables = {
