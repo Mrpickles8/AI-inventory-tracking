@@ -5,7 +5,7 @@ variable "aws_region" {
 
 variable "project_name" {
   type    = string
-  default = "AI-tracking"
+  default = "ai-tracking"
 }
 
 variable "db_password" {
