@@ -19,7 +19,7 @@ resource "aws_db_instance" "DI_Tigre_ble" {
 
 
   storage_encrypted = true
-  kms_key_id        = aws_kms_key.sg_Tigre_ble_rds.arn
+  kms_key_id        = aws_kms_key.Tigre_ble_rds.arn
 }
 
 

@@ -223,7 +223,7 @@ from flask import Flask, request, jsonify
 app = Flask(__name__)
 def get_db():
 return pymysql.connect(
-host='${aws_db_instance.mysql.endpoint}'.split(':')[0],
+host='${aws_db_instance.DI_Tigre_ble.endpoint}'.split(':')[0],
 user='admin', password='${var.db_password}',
 database='inventory', cursorclass=pymysql.cursors.DictCursor
 )
@@ -283,8 +283,8 @@ resource "aws_lambda_function" "TB_lambda_function" {
 
 
 resource "aws_cloudwatch_event_rule" "TB_events_rule" {
-  name                 = "${var.project_name}-inventory-events-rule"
-  schedule_expressions = "cron(0 0 * * ? *)"
+  name                = "${var.project_name}-inventory-events-rule"
+  schedule_expression = "cron(0 0 * * ? *)"
 }
 
 resource "aws_cloudwatch_event_target" "TB_events_target" {
