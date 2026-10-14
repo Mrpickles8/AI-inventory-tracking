@@ -268,7 +268,7 @@ data "archive_file" "lambda" {
 
 
 resource "aws_lambda_function" "TB_lambda_function" {
-  filename         = data.archive_file.lamnda.output_path
+  filename         = data.archive_file.lambda.output_path
   function_name    = "${var.project_name}-inventory-analysis"
   role             = aws_iam_role.lambda_role_Tigre_ble.arn
   handler          = "lambda_ai_analysis.lambda_handler"
