@@ -186,6 +186,7 @@ resource "aws_security_group" "sg_Tigre_ble_ec2" {
 }
 
 resource "aws_security_group" "sg_Tigre_ble_rds" {
+  vpc_id = aws_vpc.Tigre_ble.id
 
   ingress {
     from_port       = 3306
