@@ -89,7 +89,7 @@ jobs:
         run: |
           echo "Testing AI analysis Lambda..."
           aws lambda invoke \
-            --function-name ai-inventory-ai-analysis \
+            --function-name ai-tracking-inventory-analysis \
             --payload '{}' \
             --cli-binary-format raw-in-base64-out \
             response.json
