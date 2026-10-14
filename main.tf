@@ -128,7 +128,7 @@ resource "aws_network_acl" "NACL_PRIVE1" {
   }
   ingress {
     protocol   = "tcp"
-    rule_no    = 100
+    rule_no    = 150
     action     = "allow"
     cidr_block = "10.0.2.0/24"
     from_port  = 1024
@@ -151,7 +151,7 @@ resource "aws_network_acl" "NACL_PRIVE2" {
   }
   ingress {
     protocol   = "tcp"
-    rule_no    = 100
+    rule_no    = 150
     action     = "allow"
     cidr_block = "10.0.3.0/24"
     from_port  = 1024
@@ -161,6 +161,7 @@ resource "aws_network_acl" "NACL_PRIVE2" {
 
 
 resource "aws_security_group" "sg_Tigre_ble_ec2" {
+  vpc_id = aws_vpc.Tigre_ble.id
 
   ingress {
     from_port   = 80
