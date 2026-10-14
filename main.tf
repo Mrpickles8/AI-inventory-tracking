@@ -32,12 +32,14 @@ resource "aws_subnet" "public_Tigre_ble" {
   vpc_id                  = aws_vpc.Tigre_ble.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
+  availability_zone       = "${var.aws_region}a"
 }
 
 resource "aws_subnet" "prive_Tigre_ble1" {
   vpc_id                  = aws_vpc.Tigre_ble.id
   cidr_block              = "10.0.2.0/24"
   map_public_ip_on_launch = false
+  availability_zone       = "${var.aws_region}a"
 }
 
 
@@ -45,6 +47,7 @@ resource "aws_subnet" "prive_Tigre_ble2" {
   vpc_id                  = aws_vpc.Tigre_ble.id
   cidr_block              = "10.0.3.0/24"
   map_public_ip_on_launch = false
+  availability_zone       = "${var.aws_region}b"
 }
 
 
@@ -123,8 +126,8 @@ resource "aws_network_acl" "NACL_PRIVE1" {
     from_port  = 3306
     to_port    = 3306
   }
-  egress {
-    protocol   = "-1"
+  ingress {
+    protocol   = "tcp"
     rule_no    = 100
     action     = "allow"
     cidr_block = "10.0.2.0/24"
@@ -146,8 +149,8 @@ resource "aws_network_acl" "NACL_PRIVE2" {
     from_port  = 3306
     to_port    = 3306
   }
-  egress {
-    protocol   = "-1"
+  ingress {
+    protocol   = "tcp"
     rule_no    = 100
     action     = "allow"
     cidr_block = "10.0.3.0/24"
