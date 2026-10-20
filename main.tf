@@ -271,7 +271,7 @@ resource "aws_lambda_function" "TB_lambda_function" {
   filename         = data.archive_file.lambda.output_path
   function_name    = "${var.project_name}-inventory-analysis"
   role             = aws_iam_role.lambda_role_Tigre_ble.arn
-  handler          = "lambda_ai_analysis.lambda_handler"
+  handler          = "lambda_analysis.lambda_handler"
   source_code_hash = data.archive_file.lambda.output_base64sha256
 
   runtime = "python3.13"
