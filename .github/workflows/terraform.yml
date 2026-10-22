@@ -202,9 +202,23 @@ jobs:
       - name: Terraform Init
         run: terraform init
 
+      - name: SG id added
+        run: |
+          echo "SG_ID=$(terraform output -raw mon_ec2_sg_id)" >> $GITHUB_ENV
+
+      - name: IP runner added
+        id: get-ip
+        run: |
+          RUNNER_IP=$(curl -s https://api.ipify.org)
+          echo "RUNNER_IP=$RUNNER_IP" >> $GITHUB_OUTPUT
+
+      - name: Open the port 8080
+        run: aws ec2 authorize-security-group-ingress --group-id $SG_ID --protocol tcp --port 8080 --cidr ${{ steps.get-ip.outputs.RUNNER_IP }}/32 
+        
+
       - name: Flask Health Check
         run: |
-          EC2_IP=$(terraform output -raw app_public_ip 2>/dev/null) || true
+          EC2_IP=$(terraform output -raw app_tigre_bleu_ip 2>/dev/null) || true
 
           if [ -z "$EC2_IP" ]; then
             echo "Could not get EC2 IP"
@@ -214,7 +228,7 @@ jobs:
           for i in $(seq 1 12); do
             STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
               --connect-timeout 10 \
-              "http://$EC2_IP/health" 2>/dev/null) || true
+              "http://$EC2_IP:8080/health" 2>/dev/null) || true
 
             if [ "$STATUS" = "200" ]; then
               echo "Flask health check passed"
@@ -227,6 +241,11 @@ jobs:
 
           echo "Health check failed"
           exit 1
+
+      - name: Close the open port on Security group ec2
+        if: always()
+        run: aws ec2 revoke-security-group-ingress --group-id $SG_ID --protocol tcp --port 8080 --cidr ${{ steps.get-ip.outputs.RUNNER_IP }}/32 
+
 
       - name: Test AI Lambda
         run: |

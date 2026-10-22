@@ -168,6 +168,14 @@ resource "aws_network_acl" "NACL_PRIVE2" {
 resource "aws_security_group" "sg_Tigre_ble_ec2" {
   vpc_id = aws_vpc.Tigre_ble.id
 
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   ingress {
     from_port   = 80
     to_port     = 80
@@ -207,12 +215,21 @@ resource "aws_iam_instance_profile" "Iam_inst_prof_Tigre_ble" {
   role = aws_iam_role.ec2_Tigre_ble.name
 }
 
-data "aws_ami" "ami_Tigre_bleu" {
+data "aws_ami" "amazon_linux" {
   most_recent = true
   owners      = ["amazon"]
+
   filter {
     name   = "name"
-    values = ["al2023-ami-*-x86_64"]
+    values = ["al2023-ami-2023.*-kernel-6.18-x86_64"]
+  }
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
   }
 }
 
@@ -223,44 +240,66 @@ resource "aws_instance" "app_tigre_bleu" {
   subnet_id              = aws_subnet.public_Tigre_ble.id
   vpc_security_group_ids = [aws_security_group.sg_Tigre_ble_ec2.id]
   iam_instance_profile   = aws_iam_instance_profile.Iam_inst_prof_Tigre_ble.name
-  user_data              = <<-EOF
-#!/bin/bash
-yum update -y && yum install -y python3 python3-pip
-pip3 install flask boto3 pymysql
-cat > /home/ec2-user/app.py << 'APPEOF'
-import boto3, json, pymysql
-from flask import Flask, request, jsonify
-app = Flask(__name__)
-def get_db():
-return pymysql.connect(
-host='${aws_db_instance.DI_Tigre_ble.endpoint}'.split(':')[0],
-user='admin', password='${var.db_password}',
-database='inventory', cursorclass=pymysql.cursors.DictCursor
-)
-@app.route('/products', methods=['GET'])
-def get_products():
-db = get_db()
-with db.cursor() as cursor:
-cursor.execute('SELECT * FROM products')
-return jsonify(cursor.fetchall())
-@app.route('/products', methods=['POST'])
-def add_product():
-data = request.json
-db = get_db()
-with db.cursor() as cursor:
-cursor.execute(
-'INSERT INTO products (name, quantity, price) VALUES (%s, %s, %s)',
-(data['name'], data['quantity'], data['price'])
-)
-db.commit()
-return jsonify({'status': 'created'}), 201
-if __name__ == '__main__':
-app.run(host='0.0.0.0', port=80)
-APPEOF
-python3 /home/ec2-user/app.py &
-EOF
-  tags                   = { Name = "${var.project_name}-app" }
+
+  user_data = <<-EOF
+    #!/bin/bash
+    # Mise à jour du système et installation de Python
+    yum update -y && yum install -y python3 python3-pip
+
+    # Installation des dépendances applicatives
+    pip3 install flask boto3 pymysql
+
+    # Création de l'application Flask
+    cat > /home/ec2-user/app.py << 'APPEOF'
+    import boto3
+    import json
+    import pymysql
+    from flask import Flask, request, jsonify
+
+    app = Flask(__name__)
+
+    def get_db():
+        return pymysql.connect(
+            host='${aws_db_instance.DI_Tigre_ble.endpoint}'.split(':')[0],
+            user='admin',
+            password='${var.db_password}',
+            database='inventory',
+            cursorclass=pymysql.cursors.DictCursor
+        )
+
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        return jsonify({'status': 'healthy'}), 200
+
+    @app.route('/products', methods=['GET'])
+    def get_products():
+        db = get_db()
+        with db.cursor() as cursor:
+            cursor.execute('SELECT * FROM products')
+            return jsonify(cursor.fetchall())
+
+    @app.route('/products', methods=['POST'])
+    def add_product():
+        data = request.json
+        db = get_db()
+        with db.cursor() as cursor:
+            cursor.execute(
+                'INSERT INTO products (name, quantity, price) VALUES (%s, %s, %s)',
+                (data['name'], data['quantity'], data['price'])
+            )
+        db.commit()
+        return jsonify({'status': 'created'}), 201
+
+    if __name__ == '__main__':
+        # Configuration sur le port 8080 pour la pipeline CI/CD
+        app.run(host='0.0.0.0', port=8080)
+    APPEOF
+
+    # Lancement de l'application en arrière-plan
+    python3 /home/ec2-user/app.py &
+  EOF
 }
+
 
 
 
@@ -317,4 +356,13 @@ output "app_url" {
 
 output "db_endpoint" {
   value = aws_db_instance.DI_Tigre_ble.endpoint
+}
+
+output "mon_ec2_sg_id" {
+  value       = aws_security_group.sg_Tigre_ble_ec2.id
+  description = "L'ID du Security Group genere dynamiquement"
+}
+
+output "app_tigre_bleu_ip" {
+  value = aws_instance.app_tigre_bleu.public_ip
 }
