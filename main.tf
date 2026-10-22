@@ -215,7 +215,7 @@ resource "aws_iam_instance_profile" "Iam_inst_prof_Tigre_ble" {
   role = aws_iam_role.ec2_Tigre_ble.name
 }
 
-data "aws_ami" "amazon_linux" {
+data "aws_ami" "ami_Tigre_bleu" {
   most_recent = true
   owners      = ["amazon"]
 
